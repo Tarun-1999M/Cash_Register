@@ -27,3 +27,50 @@ body{
     margin-top:10px;
     font-size:large;
 }
+
+#drawer{
+    width:300px;
+    background-color: #a7bcb9;
+    color:black;
+    border-radius:20px;
+}
+
+#drawer ul li{
+    list-style-position: outside;
+    margin:2px auto;
+    width:100px;
+    text-align: left;
+    list-style-type: none;
+    
+}
+
+#change-due p{
+    margin:2px auto;
+    padding:0;
+    width:100px;
+    text-align: left;
+    
+}
+
+#drawer p{
+    margin-top:5px;
+}
+
+#change-due{
+    background-color:#233142;
+    color:#e3e3e3;
+    margin:4px;
+    padding:4px;
+}
+
+#total{
+    width:200px;
+    border:20px solid #a7bcb9;
+    color:white;
+    background-color: black;
+    margin:20px;
+    padding:10px;
+
+
+
+}
