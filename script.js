@@ -1,138 +1,102 @@
-const price = 19.5;
-
-let cid = [["PENNY", 1.01], ["NICKEL", 2.05], ["DIME", 3.1], ["QUARTER", 4.25], ["ONE", 90], ["FIVE", 55], ["TEN", 20], ["TWENTY", 60], ["ONE HUNDRED", 100]];
-cid = cid.slice().reverse();
-
-const numericals = {
-    "ONE HUNDRED":100,
-    "TWENTY":20,
-    "TEN":10,
-    "FIVE":5,
-    "ONE":1,
-    "QUARTER":0.25,
-    "DIME":0.1,
-    "NICKEL":0.05,
-    "PENNY":0.01,
-
-
-}
-const clf=
-    {
-'Hundreds':[100,1],
-'Twenty': [20,3],
-'Ten': [10,2],
-'Five':[5,11],
-'One':[1,90],
-'Quater':[0.25,17],
-'Dime':[0.1,31],
-'Nickel':[0.05,41],
-'Pennie':[0.01,101]
-};
-
-let cash = document.getElementById('cash');
+const cash = document.getElementById('cash');
 const purchaseBtn = document.getElementById('purchase-btn');
-const myForm = document.getElementById('myForm');
+const total = document.getElementById('total');
 const drawer = document.getElementById('drawer');
-const changeDue = document.getElementById('change-due');
+const changeDue = document.getElementById('change-due')
+const myForm = document.getElementById('myForm')
+
+const cid = [["PENNY", 1.01], ["NICKEL", 2.05], ["DIME", 3.1], ["QUARTER", 4.25], ["ONE", 90], ["FIVE", 55], ["TEN", 20], ["TWENTY", 60], ["ONE HUNDRED", 100]];
+const values = {
+    "PENNY":0.01,
+    "NICKEL":0.05,
+    "DIME":0.1,
+    "QUARTER":0.25,
+    "ONE":1,
+    "FIVE":5,
+    "TEN":10,
+    "TWENTY":20,
+    "ONE HUNDRED":100
+}
+const price = 3.26;
 
 
-
-const balance =(e)=>{
-
-    
-    let realCash = parseFloat(cash.value);
-    cash.value="";
-    e.preventDefault();
-    if(realCash < price){
+const checkBalance = () => {
+    const returnCash={};
+    changeDue.innerHTML="";
+    drawer.innerHTML = "";
+    const cashValue = Number((parseFloat(cash.value)).toFixed(4));
+    let change = Number((cashValue - price).toFixed(4));
+    console.log(change);
+    if(isNaN(change)){
+        cash.value ="";
         alert('Customer does not have enough money to purchase the item');
-        return;
     }
-    else if(realCash===price){
-        changeDue.innerHTML = `<h2>No change due - customer paid with exact cash</h2>` 
+    else if(change===0){
+        cash.value ="";
+        changeDue.innerText = 'No change due - customer paid with exact cash';
     }
     else{
-        const change={};
-        realCash -=price;
-        realCash = Number(realCash.toFixed(4));
-        
-        changeDue.innerHTML="";
-        cid.forEach((notes)=>{
-            
-           let  coinsNumber = notes[1]/numericals[notes[0]];
-            
-            let x = Math.floor(Number((realCash/numericals[notes[0]]).toFixed(4)));
-
-            x=Math.min(x,coinsNumber);
-            
-            if(realCash >0 && realCash >= (numericals[notes[0]])){
-                
-                coinsNumber = Number((coinsNumber- x ).toFixed(4))>0? Number((coinsNumber- x ).toFixed(4)): 0;
-                
-                realCash = Number((realCash - x *numericals[notes[0]]).toFixed(4));
-            
-                cid.forEach((key)=>{
-                    
-                    if(key[1]=== notes[1]){
-                        key[1]=Number((coinsNumber * numericals[notes[0]]).toFixed(4));
-                        change[key[0]]=numericals[notes[0]]*x;
-                        
-                    }
-                }
-                    )   }
-                
-            
-            console.log(realCash,coinsNumber, x);
-            
-
-        }
-        )
-        if(realCash!==0){
-            changeDue.innerHTML = `<span>Status: INSUFFICIENT_FUNDS</span>`;
-        }
-        else if(realCash===0 && Object.values(cid).forEach((key)=>key[1]===0)){
-            changeDue.innerHTML = `<span>Status: CLOSED</span>`;
-        }
-        else{
-            
-            changeDue.innerHTML = `<span>Status: OPEN </span>`
-        }
-        
-        Object.keys(change).forEach((key)=>{
-            changeDue.innerHTML +=`<span>${[key]}: $${change[key]} </span>`
+        cash.value ="";
+        let totalCash =0;
+        cid.forEach((cid)=>{
+            totalCash = totalCash + cid[1];
         })
 
-        drawerDisplay(cid);
+        if(change > totalCash){
+            changeDue.innerHTML = `<p>Status: INSUFFICIENT_FUNDS</p>`;
+        }
+        else if (change ===totalCash){
+            changeDue.innerHTML = `<p>Status: CLOSED</p>`;
+        }
+        else{
+        changeDue.innerHTML = `<p>Status: OPEN</p>`;
+        cid.slice().reverse().forEach((drawerCash)=>{
+            let count = Number((drawerCash[1]/values[drawerCash[0]]).toFixed(4));
+            let x = Math.floor(Number((change/values[drawerCash[0]]).toFixed(4))); /*x means the cash required*/ 
+            x = Math.min(x,count);
+            if(change > values[drawerCash[0]] && change>0 && x>0 ){
+            change = Number((change - (x*values[drawerCash[0]])).toFixed(4));
+            drawerCash[1] = Number((drawerCash[1]- x * values[drawerCash[0]]).toFixed(2))
+            returnCash[drawerCash[0]]= Number((x*values[drawerCash[0]]).toFixed(4));
+            }
+            
 
-        
+        })
     }
+    
+    Object.keys(returnCash).forEach((key)=>{
+        changeDue.innerHTML +=`<p>${key}: ${returnCash[key]}</p>`
+    })
+    drawerDisplay();
+    
 }
 
 
-const drawerDisplay = (cid)=>{
-    
-    drawer.innerHTML =`
-    <ul>Change in drawer:
-    <li>Pennies: ${Number((cid[7][1]).toFixed(2))}</li>
-    <li>Nickels: ${Number((cid[6][1]).toFixed(2))}</li>
-    <li>Dimes: ${Number((cid[5][1]).toFixed(2))}</li>
-    <li>Quaters: ${Number((cid[4][1]).toFixed(2))}</li>
-    <li>Ones: ${Number((cid[3][1]).toFixed(2))}</li>
-    <li>Fives: ${Number((cid[2][1]).toFixed(2))}</li>
-    <li>Twenties: ${Number((cid[1][1]).toFixed(2))}</li>
-    <li>Hundreds: ${Number((cid[0][1]).toFixed(2))}</li>
-    </ul>
-    `
 }
+const drawerDisplay=()=>{
+drawer.innerHTML +=`
+<p>Change in drawer:</p>
+<ul>
+<li>Pennies: $${cid[0][1]}</li>
+<li>Nickels: $${cid[1][1]}</li>
+<li>Dimes: $${cid[2][1]}</li>
+<li>Quaters: $${cid[3][1]}</li>
+<li>Ones: $${cid[4][1]}</li>
+<li>Fives: $${cid[5][1]}</li>
+<li>Tens: $${cid[6][1]}</li>
+<li>Twenties: $${cid[7][1]}</li>
+<li>Hundreds: $${cid[8][1]}</li>
+</ul>`}
+
+drawerDisplay();
+
+const handleSubmit = (e) => {
+    e.preventDefault(); 
+    checkBalance(); 
+};
 
 
+myForm.addEventListener('submit', handleSubmit);
 
-drawerDisplay(cid);
-purchaseBtn.addEventListener('click',balance);
 
-myForm.addEventListener('keypress',(e)=>{
-    if(e.key==='Enter'){
-    e.preventDefault();
-    balance(e);}
-    
-});
-
+purchaseBtn.addEventListener('click', handleSubmit);
