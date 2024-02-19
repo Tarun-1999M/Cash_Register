@@ -5,7 +5,7 @@ const drawer = document.getElementById('drawer');
 const changeDue = document.getElementById('change-due')
 const myForm = document.getElementById('myForm')
 
-const cid = [["PENNY", 1.01], ["NICKEL", 2.05], ["DIME", 3.1], ["QUARTER", 4.25], ["ONE", 90], ["FIVE", 55], ["TEN", 20], ["TWENTY", 60], ["ONE HUNDRED", 100]];
+let cid = [["PENNY", 0.5], ["NICKEL", 0], ["DIME", 0], ["QUARTER", 0], ["ONE", 0], ["FIVE", 0], ["TEN", 0], ["TWENTY", 0], ["ONE HUNDRED", 0]];
 const values = {
     "PENNY":0.01,
     "NICKEL":0.05,
@@ -27,7 +27,7 @@ const checkBalance = () => {
     const cashValue = Number((parseFloat(cash.value)).toFixed(4));
     let change = Number((cashValue - price).toFixed(4));
     console.log(change);
-    if(isNaN(change)){
+    if(isNaN(change) || change<0){
         cash.value ="";
         alert('Customer does not have enough money to purchase the item');
     }
@@ -36,6 +36,7 @@ const checkBalance = () => {
         changeDue.innerText = 'No change due - customer paid with exact cash';
     }
     else{
+        const cid_copy = cid;
         cash.value ="";
         let totalCash =0;
         cid.forEach((cid)=>{
@@ -45,11 +46,11 @@ const checkBalance = () => {
         if(change > totalCash){
             changeDue.innerHTML = `<p>Status: INSUFFICIENT_FUNDS</p>`;
         }
-        else if (change ===totalCash){
-            changeDue.innerHTML = `<p>Status: CLOSED</p>`;
-        }
-        else{
-        changeDue.innerHTML = `<p>Status: OPEN</p>`;
+        else {
+            if (change ===totalCash){
+                changeDue.innerHTML = `<p>Status: CLOSED</p>`;}
+            else{
+        changeDue.innerHTML = `<p>Status: OPEN</p>`;}
         cid.slice().reverse().forEach((drawerCash)=>{
             let count = Number((drawerCash[1]/values[drawerCash[0]]).toFixed(4));
             let x = Math.floor(Number((change/values[drawerCash[0]]).toFixed(4))); /*x means the cash required*/ 
@@ -60,15 +61,25 @@ const checkBalance = () => {
             returnCash[drawerCash[0]]= Number((x*values[drawerCash[0]]).toFixed(4));
             }
             
-
+            console.log(change);
         })
+        if(change===0){
+            Object.keys(returnCash).forEach((key)=>{
+                changeDue.innerHTML +=`<p>${key}: $${returnCash[key]}</p>`
+            })
+            drawerDisplay();
+
+        }
+        else{
+            changeDue.innerHTML = `<p>Status: INSUFFICIENT_FUNDS</p>`;
+            cid=cid_copy;
+            drawerDisplay();
+        }
     }
     
-    Object.keys(returnCash).forEach((key)=>{
-        changeDue.innerHTML +=`<p>${key}: ${returnCash[key]}</p>`
-    })
-    drawerDisplay();
     
+
+
 }
 
 
