@@ -47,8 +47,8 @@ body{
 #change-due p{
     margin:2px auto;
     padding:0;
-    width:100px;
-    text-align: left;
+    width:fit-content;
+    text-align: center;
     
 }
 

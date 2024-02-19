@@ -1,4 +1,21 @@
-const price = 3.26;
+const price = 19.5;
+
+let cid = [["PENNY", 1.01], ["NICKEL", 2.05], ["DIME", 3.1], ["QUARTER", 4.25], ["ONE", 90], ["FIVE", 55], ["TEN", 20], ["TWENTY", 60], ["ONE HUNDRED", 100]];
+cid = cid.slice().reverse();
+
+const numericals = {
+    "ONE HUNDRED":100,
+    "TWENTY":20,
+    "TEN":10,
+    "FIVE":5,
+    "ONE":1,
+    "QUARTER":0.25,
+    "DIME":0.1,
+    "NICKEL":0.05,
+    "PENNY":0.01,
+
+
+}
 const clf=
     {
 'Hundreds':[100,1],
@@ -30,80 +47,86 @@ const balance =(e)=>{
         alert('Customer does not have enough money to purchase the item');
         return;
     }
-
     else if(realCash===price){
         changeDue.innerHTML = `<h2>No change due - customer paid with exact cash</h2>` 
     }
-    
     else{
         const change={};
         realCash -=price;
         realCash = Number(realCash.toFixed(4));
         
         changeDue.innerHTML="";
-        Object.values(clf).map((notes)=>{
-            let x = Math.floor(Number((realCash/notes[0]).toFixed(4)));
-            if(realCash >0 && realCash >= (notes[0]) && notes[1]>x){
-                
-                notes[1] = Number((notes[1]- x ).toFixed(4))>0? Number((notes[1]- x ).toFixed(4)): 0;
-                
-                realCash = Number((realCash - x *notes[0]).toFixed(4));
+        cid.forEach((notes)=>{
             
-                Object.keys(clf).forEach((key)=>{
-                    if(clf[key][0]=== notes[0]){
-                        clf[key][1]=notes[1];
-                        change[key]=notes[0]*x;
+           let  coinsNumber = notes[1]/numericals[notes[0]];
+            
+            let x = Math.floor(Number((realCash/numericals[notes[0]]).toFixed(4)));
+
+            x=Math.min(x,coinsNumber);
+            
+            if(realCash >0 && realCash >= (numericals[notes[0]])){
+                
+                coinsNumber = Number((coinsNumber- x ).toFixed(4))>0? Number((coinsNumber- x ).toFixed(4)): 0;
+                
+                realCash = Number((realCash - x *numericals[notes[0]]).toFixed(4));
+            
+                cid.forEach((key)=>{
+                    
+                    if(key[1]=== notes[1]){
+                        key[1]=Number((coinsNumber * numericals[notes[0]]).toFixed(4));
+                        change[key[0]]=numericals[notes[0]]*x;
                         
                     }
                 }
                     )   }
                 
             
+            console.log(realCash,coinsNumber, x);
             
 
         }
         )
         if(realCash!==0){
-            changeDue.innerHTML = `<h2>Status: INSUFFICIENT_FUNDS</h2>`;
+            changeDue.innerHTML = `<span>Status: INSUFFICIENT_FUNDS</span>`;
         }
-        else if(realCash===0 && Object.values(clf).forEach((key)=>key[1]===0)){
-            changeDue.innerHTML = `<h2>Status: CLOSED</h2>`;
+        else if(realCash===0 && Object.values(cid).forEach((key)=>key[1]===0)){
+            changeDue.innerHTML = `<span>Status: CLOSED</span>`;
         }
         else{
             
-            changeDue.innerHTML = `<h2>Status: OPEN</h2>`
+            changeDue.innerHTML = `<span>Status: OPEN </span>`
         }
         
         Object.keys(change).forEach((key)=>{
-            changeDue.innerHTML +=`<p>${[key]}: ${change[key]}</p>`
+            changeDue.innerHTML +=`<span>${[key]}: $${change[key]} </span>`
         })
 
-        drawerDisplay(clf);
+        drawerDisplay(cid);
 
         
     }
 }
 
 
-const drawerDisplay = (clf)=>{
+const drawerDisplay = (cid)=>{
     
     drawer.innerHTML =`
     <ul>Change in drawer:
-    <li>Pennies: ${Number((clf.Pennie[1] * clf.Pennie[0]).toFixed(2))}</li>
-    <li>Nickels: ${Number((clf.Nickel[1] * clf.Nickel[0]).toFixed(2))}</li>
-    <li>Dimes: ${Number((clf.Dime[1] * clf.Dime[0]).toFixed(2))}</li>
-    <li>Quaters: ${Number((clf.Quater[1] * clf.Quater[0]).toFixed(2))}</li>
-    <li>Ones: ${Number((clf.One[1] * clf.One[0]).toFixed(2))}</li>
-    <li>Fives: ${Number((clf.Five[1] * clf.Five[0]).toFixed(2))}</li>
-    <li>Twenties: ${Number((clf.Twenty[1] * clf.Twenty[0]).toFixed(2))}</li>
-    <li>Hundreds: ${Number((clf.Hundreds[1] * clf.Hundreds[0]).toFixed(2))}</li>
+    <li>Pennies: ${Number((cid[7][1]).toFixed(2))}</li>
+    <li>Nickels: ${Number((cid[6][1]).toFixed(2))}</li>
+    <li>Dimes: ${Number((cid[5][1]).toFixed(2))}</li>
+    <li>Quaters: ${Number((cid[4][1]).toFixed(2))}</li>
+    <li>Ones: ${Number((cid[3][1]).toFixed(2))}</li>
+    <li>Fives: ${Number((cid[2][1]).toFixed(2))}</li>
+    <li>Twenties: ${Number((cid[1][1]).toFixed(2))}</li>
+    <li>Hundreds: ${Number((cid[0][1]).toFixed(2))}</li>
     </ul>
     `
 }
 
 
 
-drawerDisplay(clf);
+drawerDisplay(cid);
 purchaseBtn.addEventListener('click',balance);
 
 myForm.addEventListener('keypress',(e)=>{
